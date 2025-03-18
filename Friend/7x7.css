@@ -1,0 +1,87 @@
+/* General Styles */
+* {
+    margin: 0;
+    font-family: "Jersey 10", sans-serif;
+    font-weight: 400;
+    padding: 0;
+  }
+  
+  body {
+    background-color: #4b3c3c;
+    text-align: center;
+  }
+  
+  button {
+    cursor: pointer;
+  }
+  
+  #board {
+    height: 70vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  h1 {
+    margin-top: 1rem;
+    font-size: 80px;
+  }
+  
+  #game {
+    height: 60vmin;
+    width: 60vmin;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5vmin;
+  }
+  
+  .box {
+    height: 8vmin;
+    width: 8vmin;
+    border: none;
+    border-radius: 10%;
+    background-color: rgb(224, 218, 178);
+    box-shadow: 0 0 12px rgba(1, 1, 1, 0.25);
+    font-size: 4vmin;
+  }
+  
+  #reset, #newGame {
+    padding: 1rem;
+    font-size: 1.5rem;
+    background-color: #191919;
+    color: aliceblue;
+    border-radius: 1rem;
+    border: none;
+  }
+  
+  #winnerResult {
+    color: antiquewhite;
+    font-size: 6vmin;
+  }
+  
+  .winner {
+    height: 95vmin;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 6rem;
+  }
+  
+  .hide {
+    display: none;
+  }
+  
+  #turn {
+    font-size: 2rem;
+    margin-top: 1rem;
+    color: #b6b798;
+  }
+  
+  .scoreprint {
+    color: antiquewhite;
+    font-size: 6vmin;
+  }
+  
