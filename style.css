@@ -93,7 +93,9 @@ button:hover {
   font-size: 2rem;
   margin-bottom: 15px;
 }
-
+a {
+  text-decoration: none;
+}
 .rules ul {
   list-style-type: square;
   padding-left: 25px;
