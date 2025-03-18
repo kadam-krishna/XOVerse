@@ -15,7 +15,7 @@ let x = Math.random() * 2;
 let turnO = x > 1 ? true : false;
 if (turnO) {
     turn.innerText = "Player O's turn";
-    turn.style.color = "#33ccff";
+    turn.style.color = "#1f51ff";
     turnO=true;
 } else {
     turn.innerText = "Player X's turn";
@@ -34,7 +34,6 @@ const winnerPatterns = [
     [6, 7, 8],
 ];
 
-// Reset the game (Score resets to 0)
 const resetGame = () => {
     turnO = true;
     enableinput();
@@ -42,8 +41,6 @@ const resetGame = () => {
     playerXScore = 0;
     result.classList.add("hide");
 }
-
-// Start a new game (Score keeps intact)
 const newGame = () => {
     turnO = true;
     enableinput();
@@ -51,7 +48,6 @@ const newGame = () => {
     result.classList.add("hide");
 }
 
-// Print winner details and update the score
 const printWinner = (winner) => {
     winnerDetails.innerText = `Player ${winner} wins`;
     if (winner === "O") {
@@ -65,7 +61,6 @@ const printWinner = (winner) => {
     result.classList.remove("hide");
 }
 
-// Print draw message
 const printDraw = () => {
     winnerDetails.innerText = `It's a Draw!`;
     scoreO.innerText = `Player O Score: ${playerOScore}`;
@@ -74,14 +69,13 @@ const printDraw = () => {
     result.classList.remove("hide");
 }
 
-// Disable all inputs (no further moves after the game ends)
 const disableinput = () => {
     for (let box of board) {
         box.disabled = true;
     }
 }
 
-// Enable all inputs (when starting a new game)
+
 const enableinput = () => {
     for (let box of board) {
         box.disabled = false;
@@ -89,9 +83,7 @@ const enableinput = () => {
     }
 }
 
-// Check for a winner or draw
 const checkWinner = () => {
-    // Check for a winner
     for (let pattern of winnerPatterns) {
         let p1 = board[pattern[0]].innerText;
         let p2 = board[pattern[1]].innerText;
@@ -106,7 +98,6 @@ const checkWinner = () => {
         }
     }
 
-    // Check for a draw (all boxes filled and no winner)
     let isBoardFull = true;
     for (let box of board) {
         if (box.innerText === "") {
@@ -121,7 +112,6 @@ const checkWinner = () => {
     }
 }
 
-// Event listener for the board cells
 board.forEach((box) => {
     box.addEventListener("click", () => {
         if (turnO) {
@@ -142,6 +132,5 @@ board.forEach((box) => {
     });
 });
 
-// Event listeners for reset and new game buttons
 newBtn.addEventListener("click", newGame);
 rstBtn.addEventListener("click", resetGame);
