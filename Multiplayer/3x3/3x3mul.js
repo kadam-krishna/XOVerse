@@ -13,6 +13,7 @@ search.addEventListener('click', () => {
     if (ws) {
         ws.close();
     }
+    // ws = new WebSocket('ws://localhost:3000'); 
     ws = new WebSocket('https://xoverse3x3.onrender.com'); 
 
     clearBoard();
@@ -29,17 +30,24 @@ search.addEventListener('click', () => {
         const data = JSON.parse(event.data);
         if (data.type === 'start') {
             currentPlayer = data.currentPlayer;
-            turn.textContent = currentPlayer ? 'Your Turn' : "Opponent's turn";
+
+            turn.textContent = currentPlayer ? `Your Turn ${data.chance}` : `Opponent's turn ${data.chance}`;
             message.textContent = '';
             board.style.display = 'grid';
             search.style.display='none';
         } else if (data.type === 'move') {
             updateBoard(data.board);
             currentPlayer = data.currentPlayer;
-            turn.textContent = currentPlayer ? 'Your Turn' : "Opponent's turn";
+            console.log(data.chance);
+            if(data.chance=='O'){
+                data.chance='X';
+            }else{
+                data.chance='O';
+            }
+            turn.textContent = currentPlayer ? `Your Turn (${data.chance})` : `Opponent's turn (${data.chance})`;
         } else if (data.type === 'win') {
             message.textContent = `Player ${data.winner} wins!`;
-            turn.textContent='';
+            turn.style.display='none';
             gameOver = true;
             disableBoard();
             restart.style.display = 'inline-block';
@@ -52,8 +60,11 @@ search.addEventListener('click', () => {
             enableBoard();
             updateBoard(Array(9).fill(null));
         } else if (data.type === 'disconnect') { 
-            message.textContent = 'Opponent disconnected';
             gameOver = true;
+            setTimeout(function() {
+                alert('Opponent Disconneted');
+                window.location.reload();
+            }, 1000);
             disableBoard();
             board.style.display='none';
             search.style.display='inline-block';

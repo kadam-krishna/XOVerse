@@ -24,12 +24,14 @@ wss.on('connection', (ws) => {
             currentPlayer: Math.random() > 0.5 ? playerX : playerO,
             winner: null,
             gameOver: false,
+            chance:'',
         };
 
         games.push(game);
         game.players.forEach(player => player.send(JSON.stringify({
             type: 'start',
-            currentPlayer: game.currentPlayer === player
+            currentPlayer: game.currentPlayer === player,
+            chance : game.currentPlayer === game.players[0] ? 'X' : 'O',
         })));
     }
 
@@ -45,7 +47,8 @@ wss.on('connection', (ws) => {
                 game.players.forEach(player => player.send(JSON.stringify({
                     type: 'move',
                     board: game.board,
-                    currentPlayer: game.currentPlayer === player
+                    chance : playerX ? 'X' : 'O',
+                    currentPlayer: game.currentPlayer === player,
                 })));
 
                 checkWinner(game);
