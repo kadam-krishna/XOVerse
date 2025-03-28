@@ -1,40 +1,111 @@
-const socket = io();
+const search = document.getElementById('search');
+const board = document.getElementById('board');
+const message = document.getElementById('message');
+const turn = document.getElementById('turn');
+const restart = document.getElementById('reset');
+const cells = document.querySelectorAll('.cell');
 
-let playerSymbol = "";
-let turn = "X"; 
-let board = document.querySelectorAll(".box");
-let statusText = document.getElementById("status");
+let ws;
+let currentPlayer = null;
+let gameOver = false;
 
-socket.on("playerType", (symbol) => {
-    playerSymbol = symbol;
-    statusText.innerText = `You are Player ${playerSymbol}`;
-});
+search.addEventListener('click', () => {
+    if (ws) {
+        ws.close();
+    }
+    ws = new WebSocket('ws://localhost:3000'); 
 
-socket.on("full", () => {
-    alert("Game is full! Try again later.");
-});
+    clearBoard();
+    message.textContent = 'Waiting for Opponent...';
+    turn.textContent = '';
+    restart.style.display = 'none';
+    gameOver = false;
 
-socket.on("updateBoard", ({ boardState, currentTurn }) => {
-    turn = currentTurn;
-    board.forEach((box, index) => {
-        box.innerText = boardState[index];
-    });
-    statusText.innerText = `Player ${turn}'s turn`;
-});
+    ws.onopen = () => {
+        board.style.display = 'none';
+    };
 
-board.forEach((box, index) => {
-    box.addEventListener("click", () => {
-        if (playerSymbol === turn && box.innerText === "") {
-            socket.emit("move", { index, player: playerSymbol });
+    ws.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        if (data.type === 'start') {
+            currentPlayer = data.currentPlayer;
+            turn.textContent = currentPlayer ? 'Your Turn' : "Opponent's turn";
+            message.textContent = '';
+            board.style.display = 'grid';
+            search.style.display='none';
+        } else if (data.type === 'move') {
+            updateBoard(data.board);
+            currentPlayer = data.currentPlayer;
+            turn.textContent = currentPlayer ? 'Your Turn' : "Opponent's turn";
+        } else if (data.type === 'win') {
+            message.textContent = `Player ${data.winner} wins!`;
+            gameOver = true;
+            disableBoard();
+            restart.style.display = 'inline-block';
+        } else if (data.type === 'restart') {
+            currentPlayer = data.currentPlayer;
+            turn.textContent = currentPlayer ? 'Your Turn' : "Opponent's turn";
+            message.textContent = '';
+            gameOver = false;
+            restart.style.display = 'none';
+            enableBoard();
+            updateBoard(Array(9).fill(null));
+        } else if (data.type === 'disconnect') { // Fixed spelling mistake
+            message.textContent = 'Opponent disconnected';
+            gameOver = true;
+            disableBoard();
+            board.style.display='none';
+            search.style.display='inline-block';
+            restart.style.display = 'inline-block';
         }
+    };
+
+    ws.onclose = () => {
+        message.textContent = 'Disconnected. Click "Player Search" to find a new opponent';
+        gameOver = true;
+        disableBoard();
+        restart.style.display = 'none';
+        search.style.display = 'inline-block';
+    };
+});
+
+
+cells.forEach(cell =>{
+    cell.addEventListener('click',()=>{
+        if(currentPlayer && cell.textContent === '' && !gameOver){
+            const index = cell.dataset.index;
+            ws.send(JSON.stringify({type:'move',index}));
+        }
+    })
+});
+
+restart.addEventListener('click',()=>{
+    ws.send(JSON.stringify({type:'restart'}));
+});
+
+function updateBoard(boardState){
+    cells.forEach((cell,index)=>{
+        cell.textContent=boardState[index];
     });
-});
+}
 
-socket.on("resetGame", () => {
-    board.forEach((box) => (box.innerText = ""));
-    statusText.innerText = "Waiting for opponent...";
-});
-
-document.getElementById("reset").addEventListener("click", () => {
-    socket.emit("resetGame");
-});
+function disableBoard(){
+    cells.forEach(cell=>{
+        cell.removeEventListener('click',()=>{});
+    });
+}
+function enableBoard(){
+    cells.forEach((cell,index)=>{
+        cell.addEventListener('click',()=>{
+            if(currentPlayer && cell.textContent === '' && !gameOver){
+                const index = cell.dataset.index;
+                ws.send(JSON.stringify({type:'move',index}));
+            }
+        });
+    });
+}
+function clearBoard(){
+    cells.forEach(cell=>{
+        cell.textContent='';
+    });
+}
