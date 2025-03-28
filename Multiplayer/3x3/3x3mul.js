@@ -39,6 +39,7 @@ search.addEventListener('click', () => {
             turn.textContent = currentPlayer ? 'Your Turn' : "Opponent's turn";
         } else if (data.type === 'win') {
             message.textContent = `Player ${data.winner} wins!`;
+            turn.textContent='';
             gameOver = true;
             disableBoard();
             restart.style.display = 'inline-block';
@@ -50,7 +51,7 @@ search.addEventListener('click', () => {
             restart.style.display = 'none';
             enableBoard();
             updateBoard(Array(9).fill(null));
-        } else if (data.type === 'disconnect') { // Fixed spelling mistake
+        } else if (data.type === 'disconnect') { 
             message.textContent = 'Opponent disconnected';
             gameOver = true;
             disableBoard();
