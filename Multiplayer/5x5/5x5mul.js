@@ -65,7 +65,7 @@ search.addEventListener('click', () => {
             }, 2000);
             gameOver = true;
             disableBoard();
-            restart.style.display = 'inline-block';
+            restart.style.display = 'block';
         }
     };
 
