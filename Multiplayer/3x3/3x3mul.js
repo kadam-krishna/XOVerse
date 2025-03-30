@@ -13,8 +13,8 @@ search.addEventListener('click', () => {
     if (ws) {
         ws.close();
     }
-    // ws = new WebSocket('ws://localhost:3000'); 
-    ws = new WebSocket('https://xoverse3x3.onrender.com'); 
+    ws = new WebSocket('ws://localhost:3000'); 
+    // ws = new WebSocket('https://xoverse3x3.onrender.com'); 
 
     clearBoard();
     message.textContent = 'Waiting for Opponent...';
@@ -71,6 +71,9 @@ search.addEventListener('click', () => {
 
     ws.onclose = () => {
         message.textContent = 'Disconnected. Click "Player Search" to find a new opponent';
+        setTimeout(function(){
+            window.location.reload();
+        }, 2000);
         gameOver = true;
         disableBoard();
         restart.style.display = 'none';
