@@ -107,8 +107,8 @@ const minimax = (newBoard, isMaximizing) => {//Algo
         if (newBoard[i].innerText === "") emptySpots.push(i);
     }
 
-    if (checkWin(newBoard, "O")) return { score: 10 };
-    if (checkWin(newBoard, "X")) return { score: -10 };
+    if (checkWin(newBoard, "O")) return { score: 1 };
+    if (checkWin(newBoard, "X")) return { score: -1 };
     if (emptySpots.length === 0) return { score: 0 };
 
     let moves = [];
