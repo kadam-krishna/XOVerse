@@ -18,10 +18,11 @@ wss.on('connection', (ws) => {
     if (waitingPlayer.length >= 2) {
         const playerX = waitingPlayer.shift();
         const playerO = waitingPlayer.shift();
+        let x=Math.random();
         const game = {
             players: [playerX, playerO],
             board: Array(9).fill(null),
-            currentPlayer: Math.random() > 0.5 ? playerX : playerO,
+            currentPlayer: x > 0.5 ? playerX : playerO,
             winner: null,
             gameOver: false,
             chance:'',
@@ -31,7 +32,7 @@ wss.on('connection', (ws) => {
         game.players.forEach(player => player.send(JSON.stringify({
             type: 'start',
             currentPlayer: game.currentPlayer === player,
-            chance : game.currentPlayer === game.players[0] ? 'X' : 'O',
+            chance:x > 0.5?'X':'O',
         })));
     }
 
@@ -47,7 +48,7 @@ wss.on('connection', (ws) => {
                 game.players.forEach(player => player.send(JSON.stringify({
                     type: 'move',
                     board: game.board,
-                    chance : playerX ? 'X' : 'O',
+                    chance: game.currentPlayer === game.players[0] ? 'O' : 'X',
                     currentPlayer: game.currentPlayer === player,
                 })));
 
@@ -55,14 +56,16 @@ wss.on('connection', (ws) => {
             }
         } else if (data.type === 'restart' && game) {
             game.board = Array(9).fill(null);
-            game.currentPlayer = Math.random() > 0.5 ? game.players[0] : game.players[1];
+            let y=Math.random();
+            game.currentPlayer = y> 0.5 ? game.players[0] : game.players[1];
             game.winner = null;
             game.gameOver = false;
 
             game.players.forEach(player => player.send(JSON.stringify({
                 type: 'restart',
                 board: game.board,
-                currentPlayer: game.currentPlayer === player
+                currentPlayer: game.currentPlayer === player,
+                chance:y > 0.5?'X':'O',
             })));
         }
     });

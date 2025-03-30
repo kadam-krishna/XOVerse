@@ -21,7 +21,7 @@ h1{
   margin-bottom: 50px;
   font-size: 60px;
 }
-#search,#reset{
+#search{
   padding: 0.5rem;
   font-size: 1.5rem;
   background-color: #191919;
@@ -29,44 +29,62 @@ h1{
   border-radius: 1rem;
   border: none;
 }
+#search:hover{
+  background: #62629f;
+  transform: scale(1.2);
+}
+#reset{
+  padding: 0.5rem;
+  font-size: 1.5rem;
+  background-color: #191919;
+  color: aliceblue;
+  border-radius: 1rem;
+  border: none;
+  display: none;
+}
 
 #game{
   display: inline-flex;
   justify-content: center;
-  background: #62629f;
+  /* background: #62629f; */
   padding: 20px;
   border-radius: 10px;
   margin-bottom: 40px;
-  box-shadow: 0 4px 8px rgb(1, 1, 1);
 }
 
 #board{
   display: flex;
-  grid-template-columns: repeat(3,100px);
-  grid-template-rows: repeat(3,100px);
+  grid-template-columns: repeat(3,120px);
+  grid-template-rows: repeat(3,120px);
   gap: 10px;
   margin-top: 20px;
 }
 
 .cell{
-  width: 100px;
-  height: 100px;
+  width: 120px;
+  box-shadow: 0 4px 8px rgb(1, 1, 1);
+  height: 120px;
   display: flex;
   justify-content: center;
   align-items: center;
   font-size: 2em;
-  border: 2px solid wheat;
+  border-radius: 20%;
   background: #1e1e2e;
   cursor: pointer;
+  background-color: rgb(224, 218, 178);
   transition: background 0.3s,transform 0.3s;
 }
 
 .cell:hover{
-  background: #62629f;
-  transform: scale(1.1);
+  transform: scale(1.05);
 }
 
-#message,#turn{
+#message{
+  margin-top: 20px;
+  margin-bottom: 20px;
+  font-size: 1.5em;
+}
+#turn{
   margin-top: 20px;
   font-size: 1.5em;
 }

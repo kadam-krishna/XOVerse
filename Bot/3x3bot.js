@@ -1,5 +1,5 @@
 let board = document.querySelectorAll('.box');
-let rstBtn =  document.querySelector("#reset");
+let rstBtn = document.querySelector(".reset");
 let newBtn = document.querySelector("#newGame");
 let result = document.querySelector(".winner");
 let winnerDetails = document.querySelector("#winnerResult");
@@ -8,129 +8,167 @@ let scoreO = document.querySelector("#scoreO");
 let scoreX = document.querySelector("#scoreX");
 let game = document.getElementById("main");
 
-let playerOScore = 0;
-let playerXScore = 0;
+let botScore = 0;
+let playerScore = 0;
 
-let x = Math.random() * 2;
-let turnO = x > 1 ? true : false;
-if (turnO) {
-    turn.innerText = "Player O's turn";
-    turn.style.color = "#1f51ff";
-    turnO=true;
-} else {
-    turn.innerText = "Player X's turn";
-    turn.style.color = "#ff3333 ";
-    turnO=false;
-}
+let turnO = false;
 
 const winnerPatterns = [
-    [0, 1, 2],
-    [0, 3, 6],
-    [0, 4, 8],
-    [1, 4, 7],
-    [2, 5, 8],
-    [2, 4, 6],
-    [3, 4, 5],
-    [6, 7, 8],
+    [0, 1, 2], [0, 3, 6], [0, 4, 8],
+    [1, 4, 7], [2, 5, 8], [2, 4, 6],
+    [3, 4, 5], [6, 7, 8]
 ];
 
 const resetGame = () => {
-    turnO = true;
-    enableinput();
-    playerOScore = 0;
-    playerXScore = 0;
+    turnO = false; 
+    enableInput();
+    botScore = 0;
+    playerScore = 0;
     result.classList.add("hide");
+    updateTurnDisplay();
+    if (turnO) botMove(); 
 }
+
 const newGame = () => {
-    turnO = true;
-    enableinput();
-    game.style.display="block";
+    turnO = Math.random() < 0.5;
+    enableInput();
+    game.style.display = "block";
     result.classList.add("hide");
+    updateTurnDisplay();
+    if (turnO) botMove();
+}
+
+const updateTurnDisplay = () => {
+    if (turnO) {
+        turn.innerText = "Bot's Turn (O)";
+        turn.style.color = "#1f51ff";
+        botMove();
+    } else {
+        turn.innerText = "Your Turn (X)";
+        turn.style.color = "#ff5333";
+    }
 }
 
 const printWinner = (winner) => {
-    winnerDetails.innerText = `Player ${winner} wins`;
-    if (winner === "O") {
-        playerOScore++;
-    } else {
-        playerXScore++;
-    }
-    scoreO.innerText = `Player O Score: ${playerOScore}`;
-    scoreX.innerText = `Player X Score: ${playerXScore}`;
-    game.style.display="none    ";
+    winnerDetails.innerText = winner === "O" ? "Bot Wins!" : "You Win!";
+    
+    if (winner === "O") botScore++;
+    else playerScore++;
+
+    scoreO.innerText = `Bot Score: ${botScore}`;
+    scoreX.innerText = `Your Score: ${playerScore}`;
+    
+    game.style.display = "none";
     result.classList.remove("hide");
 }
 
 const printDraw = () => {
     winnerDetails.innerText = `It's a Draw!`;
-    scoreO.innerText = `Player O Score: ${playerOScore}`;
-    scoreX.innerText = `Player X Score: ${playerXScore}`;
-    game.style.display="none";
+    scoreO.innerText = `Bot Score: ${botScore}`;
+    scoreX.innerText = `Your Score: ${playerScore}`;
+    game.style.display = "none";
     result.classList.remove("hide");
 }
 
-const disableinput = () => {
-    for (let box of board) {
-        box.disabled = true;
-    }
+const disableInput = () => {
+    board.forEach(box => box.disabled = true);
 }
 
-
-const enableinput = () => {
-    for (let box of board) {
+const enableInput = () => {
+    board.forEach(box => {
         box.disabled = false;
         box.innerText = "";
-    }
+    });
 }
 
 const checkWinner = () => {
     for (let pattern of winnerPatterns) {
-        let p1 = board[pattern[0]].innerText;
-        let p2 = board[pattern[1]].innerText;
-        let p3 = board[pattern[2]].innerText;
+        let [p1, p2, p3] = pattern.map(i => board[i].innerText);
 
-        if (p1 !== "" && p2 !== "" && p3 !== "") {
-            if (p1 === p2 && p2 === p3) {
-                printWinner(p1);
-                disableinput();
-                return;
-            }
+        if (p1 !== "" && p1 === p2 && p2 === p3) {
+            printWinner(p1);
+            disableInput();
+            return true;
         }
     }
 
-    let isBoardFull = true;
-    for (let box of board) {
-        if (box.innerText === "") {
-            isBoardFull = false;
-            break;
-        }
-    }
-
-    if (isBoardFull) {
+    if ([...board].every(box => box.innerText !== "")) {
         printDraw();
-        disableinput();
+        disableInput();
+        return true;
+    }
+
+    return false;
+}
+
+const minimax = (newBoard, isMaximizing) => {//Algo
+    let emptySpots = [];
+    for (let i = 0; i < newBoard.length; i++) {
+        if (newBoard[i].innerText === "") emptySpots.push(i);
+    }
+
+    if (checkWin(newBoard, "O")) return { score: 10 };
+    if (checkWin(newBoard, "X")) return { score: -10 };
+    if (emptySpots.length === 0) return { score: 0 };
+
+    let moves = [];
+
+    for (let i of emptySpots) {
+        let move = {};
+        move.index = i;
+        newBoard[i].innerText = isMaximizing ? "O" : "X";
+
+        let result = minimax(newBoard, !isMaximizing);
+        move.score = result.score;
+
+        newBoard[i].innerText = "";
+        moves.push(move);
+    }
+
+    let bestMove = moves.reduce((best, move) => 
+        (isMaximizing ? move.score > best.score : move.score < best.score) ? move : best
+    );
+
+    return bestMove;
+}
+
+const checkWin = (boardState, player) => {
+    return winnerPatterns.some(pattern =>
+        pattern.every(index => boardState[index].innerText === player)
+    );
+}
+const botMove = () => {
+    if (!turnO) return; 
+
+    let bestMove = minimax([...board], true).index;
+    board[bestMove].innerText = "O";
+    board[bestMove].style.color = "#1f51ff";
+    board[bestMove].disabled = true;
+
+    if (!checkWinner()) {
+        turn.innerText = "Your Turn (X)";
+        turn.style.color = "#ff5333";
+        turnO = false;
     }
 }
 
-board.forEach((box) => {
+board.forEach((box, index) => {
     box.addEventListener("click", () => {
-        if (turnO) {
-            box.innerText = "O";
-            box.style.color = "#1f51ff";
-            turn.innerText = "Player X's turn";
-            turn.style.color = "#ff5333";
-            turnO = false;
-        } else {
+        if (!turnO) {
             box.innerText = "X";
             box.style.color = "#ff5333";
-            turn.innerText = "Player O's turn";
-            turn.style.color = "#1f51ff";
+            box.disabled = true;
             turnO = true;
+
+            if (!checkWinner()) {
+                turn.innerText = "Bot's Turn (O)";
+                turn.style.color = "#1f51ff";
+                botMove();
+            }
         }
-        box.disabled = true;
-        checkWinner();
     });
 });
 
 newBtn.addEventListener("click", newGame);
 rstBtn.addEventListener("click", resetGame);
+updateTurnDisplay();
