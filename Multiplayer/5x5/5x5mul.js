@@ -13,8 +13,8 @@ search.addEventListener('click', () => {
     if (ws) {
         ws.close();
     }
-    ws = new WebSocket('ws://localhost:3000'); 
-    // ws = new WebSocket('https://xoverse3x3.onrender.com'); 
+    // ws = new WebSocket('ws://localhost:3000'); 
+    ws = new WebSocket('https://xoverse5x5.onrender.com'); 
 
     clearBoard();
     message.textContent = 'Waiting for Opponent...';
