@@ -38,7 +38,7 @@ const updateTurnDisplay = () => {
 };
 
 const resetGame = () => {
-    turnO = Math.random() < 0.5;
+    turnO = false;
     enableInput();
     botScore = 0;
     playerScore = 0;

@@ -30,7 +30,7 @@ const resetGame = () => {
 }
 
 const newGame = () => {
-    turnO = Math.random() < 0.5;
+    turnO = false;
     enableInput();
     game.style.display = "block";
     result.classList.add("hide");
