@@ -1,5 +1,5 @@
 let board = document.querySelectorAll('.box');
-let rstBtn =  document.querySelector("#reset");
+let rstBtn =  document.querySelector(".reset");
 let newBtn = document.querySelector("#newGame");
 let result = document.querySelector(".winner");
 let winnerDetails = document.querySelector("#winnerResult");
@@ -11,17 +11,9 @@ let game = document.getElementById("main");
 let playerOScore = 0;
 let playerXScore = 0;
 
-let x = Math.random() * 2;
-let turnO = x > 1 ? true : false;
-if (turnO) {
-    turn.innerText = "Player O's turn";
-    turn.style.color = "#1f51ff";
-    turnO=true;
-} else {
-    turn.innerText = "Player X's turn";
-    turn.style.color = "#ff3333 ";
-    turnO=false;
-}
+let turnO = Math.random() > 0.5;
+turn.innerText = turnO ? "Player O's turn" : "Player X's turn";
+turn.style.color = turnO ? "#1f51ff" : "#ff3333";
 
 const winnerPatterns = [
     [0, 1, 2],
@@ -35,14 +27,14 @@ const winnerPatterns = [
 ];
 
 const resetGame = () => {
-    turnO = true;
+    turnO = Math.random() > 0.5;
     enableinput();
     playerOScore = 0;
     playerXScore = 0;
     result.classList.add("hide");
 }
 const newGame = () => {
-    turnO = true;
+    turnO = Math.random() > 0.5;
     enableinput();
     game.style.display="block";
     result.classList.add("hide");
@@ -114,19 +106,11 @@ const checkWinner = () => {
 
 board.forEach((box) => {
     box.addEventListener("click", () => {
-        if (turnO) {
-            box.innerText = "O";
-            box.style.color = "#1f51ff";
-            turn.innerText = "Player X's turn";
-            turn.style.color = "#ff5333";
-            turnO = false;
-        } else {
-            box.innerText = "X";
-            box.style.color = "#ff5333";
-            turn.innerText = "Player O's turn";
-            turn.style.color = "#1f51ff";
-            turnO = true;
-        }
+        box.innerText = turnO ? "O" : "X";
+        box.style.color = turnO ? "#1f51ff" : "#ff3333";
+        turn.innerText = turnO ? "Player X's turn" : "Player O's turn";
+        turn.style.color = turnO ? "#ff3333" : "#1f51ff";
+        turnO = !turnO;
         box.disabled = true;
         checkWinner();
     });

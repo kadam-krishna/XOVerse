@@ -1,4 +1,4 @@
-let board = document.querySelectorAll('.box');
+let board = document.querySelectorAll(".box");
 let rstBtn = document.querySelector("#reset");
 let newBtn = document.querySelector("#newGame");
 let result = document.querySelector(".winner");
@@ -6,182 +6,190 @@ let winnerDetails = document.querySelector("#winnerResult");
 let turn = document.getElementById("turn");
 let scoreO = document.querySelector("#scoreO");
 let scoreX = document.querySelector("#scoreX");
-let game = document.getElementById("main");
 
 let botScore = 0;
 let playerScore = 0;
-let turnO = Math.random() < 0.5;
+let turnO = false;
 
-const winnerPatterns = [];
-for (let i = 0; i < 5; i++) {
-    for (let j = 0; j < 2; j++) {
-        winnerPatterns.push([i * 5 + j, i * 5 + j + 1, i * 5 + j + 2, i * 5 + j + 3]); // Rows
-        winnerPatterns.push([j * 5 + i, (j + 1) * 5 + i, (j + 2) * 5 + i, (j + 3) * 5 + i]); // Columns
-    }
-}
-winnerPatterns.push([0, 6, 12, 18]);
-winnerPatterns.push([1, 7, 13, 19]);
-winnerPatterns.push([5, 11, 17, 23]);
-winnerPatterns.push([4, 8, 12, 16]);
-winnerPatterns.push([9, 13, 17, 21]);
-winnerPatterns.push([14, 18, 22, 26]);
+const winnerPatterns = [
+  [ 0, 1, 2, 3 ],     [ 1, 2, 3, 4 ],
+  [ 5, 6, 7, 8 ],     [ 6, 7, 8, 9 ],
+  [ 10, 11, 12, 13 ], [ 11, 12, 13, 14 ],
+  [ 15, 16, 17, 18 ], [ 16, 17, 18, 19 ],
+  [ 20, 21, 22, 23 ], [ 21, 22, 23, 24 ],
+  [ 0, 5, 10, 15 ],   [ 5, 10, 15, 20 ],
+  [ 1, 6, 11, 16 ],   [ 6, 11, 16, 21 ],
+  [ 2, 7, 12, 17 ],   [ 7, 12, 17, 22 ],
+  [ 3, 8, 13, 18 ],   [ 8, 13, 18, 23 ],
+  [ 4, 9, 14, 19 ],   [ 9, 14, 19, 24 ],
+  [ 0, 6, 12, 18 ],   [ 1, 7, 13, 19 ],
+  [ 5, 11, 17, 23 ],  [ 6, 12, 18, 24 ],
+  [ 3, 7, 11, 15 ],   [ 4, 8, 12, 16 ],
+  [ 8, 12, 16, 20 ],  [ 9, 13, 17, 21 ]
+];
 
-const updateTurnDisplay = () => {
-    if (turnO) {
-        turn.innerText = "Bot's Turn(O)";
-        turn.style.color = "#1f51ff";
-        botMove();
-    } else {
-        turn.innerText = "Your Turn(X)";
-        turn.style.color = "#ff3333";
-    }
+
+const newGame = () => {
+  turnO = false;
+  enableInput();
+  result.classList.add("hide");
 };
 
 const resetGame = () => {
-    turnO = false;
-    enableInput();
-    botScore = 0;
-    playerScore = 0;
-    result.classList.add("hide");
-    updateTurnDisplay();
-    if (turnO) botMove();
+  turnO = false;
+  botScore = 0;
+  playerScore = 0;
+  enableInput();
+  result.classList.add("hide");
 };
 
-const newGame = () => {
-    turnO = Math.random() < 0.5;
-    enableInput();
-    result.classList.add("hide");
-    game.style.display = "block";
-    updateTurnDisplay();
-    if (turnO) botMove();
-};
-
-const printWinner = (winner) => {
-    winnerDetails.innerText = winner === "O" ? "Bot Wins!" : "You Win!";
-    if (winner === "O") botScore++;
-    else playerScore++;
-
-    scoreO.innerText = `Bot Score: ${botScore}`;
-    scoreX.innerText = `Your Score: ${playerScore}`;
-
-    game.style.display = "none";
-    result.classList.remove("hide");
-};
-
-const printDraw = () => {
-    winnerDetails.innerText = "It's a Draw!";
-    scoreO.innerText = `Bot Score: ${botScore}`;
-    scoreX.innerText = `Your Score: ${playerScore}`;
-    game.style.display = "none";
-    result.classList.remove("hide");
-};
-
-const disableInput = () => {
-    board.forEach(box => box.disabled = true);
-};
-
-const enableInput = () => {
-    board.forEach(box => {
-        box.disabled = false;
-        box.innerText = "";
-    });
+const turnMessage = () => {
+  if (turnO) {
+    turn.innerText = "Bot's Turn (O)";
+    turn.style.color = "#1f51ff";
+    botMove();
+  } else {
+    turn.innerText = "Your Turn (X)";
+    turn.style.color = "#ff5333";
+  }
 };
 
 const checkWinner = () => {
-    for (let pattern of winnerPatterns) {
-        let values = pattern.map(index => board[index]?.innerText || "");
-        if (values.every(v => v === "O")) {
-            printWinner("O");
-            disableInput();
-            return true;
-        } else if (values.every(v => v === "X")) {
-            printWinner("X");
-            disableInput();
-            return true;
-        }
+  let grid = Array.from(board).map((box) => box.innerText);
+  for (let pattern of winnerPatterns) {
+    let [a, b, c, d] = pattern;
+    if (grid[a] && grid[a] === grid[b] && grid[b] === grid[c] && grid[c] === grid[d]) {
+      printWinner(grid[a]);
+      return true;
     }
-    if ([...board].every(box => box.innerText !== "")) {
-        printDraw();
-        disableInput();
-        return true;
-    }
-    return false;
+  }
+  if (grid.every((cell) => cell !== "")) {
+    printDraw();
+    return true;
+  }
+  return false;
+};
+const disableInput = () => {
+  board.forEach(box => box.disabled = true);
 };
 
-// Minimax Algorithm for AI
-const minimax = (newBoard, isMaximizing) => {
-    let emptySpots = [];
-    for (let i = 0; i < newBoard.length; i++) {
-        if (newBoard[i].innerText === "") emptySpots.push(i);
-    }
-
-    if (checkWin(newBoard, "O")) return { score: 10 };
-    if (checkWin(newBoard, "X")) return { score: -10 };
-    if (emptySpots.length === 0) return { score: 0 };
-
-    let moves = [];
-
-    for (let i of emptySpots) {
-        let move = {};
-        move.index = i;
-        newBoard[i].innerText = isMaximizing ? "O" : "X";
-
-        let result = minimax(newBoard, !isMaximizing);
-        move.score = result.score;
-
-        newBoard[i].innerText = "";
-        moves.push(move);
-    }
-
-    let bestMove = moves.reduce((best, move) => 
-        (isMaximizing ? move.score > best.score : move.score < best.score) ? move : best
-    );
-
-    return bestMove;
+const enableInput = () => {
+  board.forEach(box => {
+      box.disabled = false;
+      box.innerText = "";
+  });
+  turnMessage();
+};
+const printWinner = (winner) => {
+  winnerDetails.innerText = winner === "O" ? "Bot Wins!" : "You Win!";
+  if (winner === "O") botScore++;
+  else playerScore++;
+  scoreO.innerText = `Bot Score: ${botScore}`;
+  scoreX.innerText = `Your Score: ${playerScore}`;
+  result.classList.remove("hide");
 };
 
-// Check if a player has won
-const checkWin = (boardState, player) => {
-    return winnerPatterns.some(pattern =>
-        pattern.every(index => boardState[index].innerText === player)
-    );
+const printDraw = () => {
+  winnerDetails.innerText = "It's a Draw!";
+  scoreO.innerText = `Bot Score: ${botScore}`;
+  scoreX.innerText = `Your Score: ${playerScore}`;
+  result.classList.remove("hide");
 };
 
-// AI Move
+
+const scores = {
+  X: -1,  
+  O: 1,   
+  tie: 0 
+};
+
+const minimax = (grid, depth, isMaximizing) => {
+  let result = getWinner(grid);
+  if (result !== null) return scores[result];
+  if(depth==4){
+    return 0;
+  }
+  if (isMaximizing) {
+    let bestScore = -Infinity;
+    for (let i = 0; i < 25; i++) {
+      if (grid[i] === "") {
+        grid[i] = "O";
+        let score = minimax(grid, depth + 1, false);
+        grid[i] = "";
+        bestScore = Math.max(score, bestScore);
+      }
+    }
+    return bestScore;
+  } else {
+    let bestScore = Infinity;
+    for (let i = 0; i < 25; i++) {
+      if (grid[i] === "") {
+        grid[i] = "X";
+
+        let score = minimax(grid, depth + 1, true);
+        grid[i] = "";
+        bestScore = Math.min(score, bestScore);
+      }
+    }
+    return bestScore;
+  }
+};
+
+const getWinner = (grid) => {
+  for (let pattern of winnerPatterns) {
+    let [a, b, c, d] = pattern;
+    if (grid[a] && grid[a] === grid[b] && grid[b] === grid[c] && grid[c] === grid[d]) {
+      return grid[a];
+    }
+  }
+  if (grid.every(cell => cell !== "")) return "tie";
+  return null;
+};
+
+const bestMove = () => {
+  let grid = Array.from(board).map((box) => box.innerText || "");
+  let bestScore = -Infinity;
+  let move = null;
+  for (let i = 0; i < 25; i++) {
+    if (grid[i] === "") {
+      grid[i] = "O";
+      let score = minimax(grid, 0, false);
+      grid[i] = "";
+      if (score > bestScore) {
+        bestScore = score;
+        move = i;
+      }
+    }
+  }
+  return move;
+};
+
 const botMove = () => {
-    if (!turnO) return; // Only execute if it's Bot's turn
-
-    let bestMove = minimax([...board], true).index;
-    board[bestMove].innerText = "O";
-    board[bestMove].style.color = "#1f51ff";
-    board[bestMove].disabled = true;
-
-    if (!checkWinner()) {
-        turn.innerText = "Your Turn(X)";
-        turn.style.color = "#ff3333";
-        turnO = false;
-    }
+  if (!turnO) return;
+  let move = bestMove();
+  if (move !== null) {
+    board[move].innerText = "O";
+    board[move].style.color = "#1f51ff";
+    board[move].disabled = true;
+  }
+  if (!checkWinner()) {
+    turnO = false;
+    turnMessage();
+  }
 };
 
-// Player Move
 board.forEach((box) => {
-    box.addEventListener("click", () => {
-        if (!turnO) {
-            box.innerText = "X";
-            box.style.color = "#ff3333";
-            box.disabled = true;
-            turnO = true;
-
-            if (!checkWinner()) {
-                turn.innerText = "Bot's Turn(O)";
-                turn.style.color = "#1f51ff";
-                botMove();
-            }
-        }
-    });
+  box.addEventListener("click", () => {
+    if (!turnO && box.innerText === "") {
+      box.innerText = "X";
+      box.style.color = "#ff5333";
+      box.disabled = true;
+      turnO = true;
+      if (!checkWinner()) turnMessage();
+    }
+  });
 });
 
 newBtn.addEventListener("click", newGame);
 rstBtn.addEventListener("click", resetGame);
-
-updateTurnDisplay();
+turnMessage();

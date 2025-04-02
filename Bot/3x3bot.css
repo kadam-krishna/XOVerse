@@ -44,7 +44,7 @@
     box-shadow: 0 0 12px rgba(1, 1, 1, 0.25);
     font-size: 8vmin;
   }
-  .reset {
+  #reset {
     padding: 0.5rem;
     font-size: 1.5rem;
     background-color: #191919;
